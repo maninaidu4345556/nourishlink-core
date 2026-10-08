@@ -1,0 +1,194 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NourishLink | Food Waste Management</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    @keyframes pulse-urgent {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+    .urgent-pulse { animation: pulse-urgent 2s infinite; border: 2px solid #ef4444 !important; }
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 1000;
+      justify-content: center; align-items: center;
+    }
+    .modal-box {
+      background: white; border-radius: 16px; padding: 30px; max-width: 440px; width: 90%;
+      text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+    .pin-display {
+      font-size: 38px; font-weight: 800; letter-spacing: 8px; color: #15803d;
+      background: #f0fdf4; border: 2px dashed #86efac; padding: 12px; border-radius: 12px; margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar-wrapper">
+    <nav class="navbar">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">🌱</div>
+        <div>
+          <span class="brand-name">NourishLink</span>
+          <span class="brand-tag">Zero Food Waste Network</span>
+        </div>
+      </a>
+      
+      <div class="nav-links">
+        <a href="index.html" class="nav-link active">Surplus Feed</a>
+        <a href="user.html" class="nav-link">User Workspace</a>
+        <a href="admin.html" id="adminLink" class="nav-link" style="display:none; color:#d97706; font-weight:700;">⚡ Super Admin</a>
+      </div>
+
+      <div class="nav-links" id="navAuth"></div>
+    </nav>
+  </header>
+
+  <!-- Eco Impact Bar -->
+  <section class="analytics-bar">
+    <div class="stat-pill">
+      <div class="stat-icon">🥗</div>
+      <div>
+        <div class="stat-val" id="statMeals">0</div>
+        <div class="stat-desc">Meals Delivered</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-icon">🌍</div>
+      <div>
+        <div class="stat-val" id="statCO2">0 kg</div>
+        <div class="stat-desc">CO₂e Prevented</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-icon">💧</div>
+      <div>
+        <div class="stat-val" id="statWater">0 L</div>
+        <div class="stat-desc">Water Conserved</div>
+      </div>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-icon">⚡</div>
+      <div>
+        <div class="stat-val" id="statUrgent" style="color:var(--urgent);">0</div>
+        <div class="stat-desc">Urgent Dispatches</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Platform Layout -->
+  <main class="main-layout">
+    
+    <!-- Donor Form Panel -->
+    <aside class="card-box">
+      <h3 class="card-title">List Surplus Food</h3>
+      <p class="card-subtitle">Connect extra inventory with verified local charities</p>
+
+      <form id="createDonationForm">
+        <div class="field">
+          <label>Donor / Establishment Name</label>
+          <input type="text" id="fDonor" class="input-ctrl" placeholder="e.g. Royal Caterers / KL Food Court" required>
+        </div>
+
+        <div class="field">
+          <label>Food Item Description</label>
+          <input type="text" id="fItem" class="input-ctrl" placeholder="e.g. 50 Boxes Fresh Meal Rice & Dal" required>
+        </div>
+
+        <div class="row-2 field">
+          <div>
+            <label>Estimated Quantity (kg)</label>
+            <input type="number" id="fQuantity" class="input-ctrl" placeholder="e.g. 25" required min="1">
+          </div>
+          <div>
+            <label>Dietary Type</label>
+            <select id="fDiet" class="input-ctrl">
+              <option value="Veg">Vegetarian</option>
+              <option value="Vegan">Vegan</option>
+              <option value="Non-Veg">Non-Vegetarian</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Location Dropdown for Regional Matching -->
+        <div class="row-2 field">
+          <div>
+            <label>Pickup Location Hub</label>
+            <select id="fLocation" class="input-ctrl" required>
+              <option value="Kolanukonda">Kolanukonda</option>
+              <option value="Vijayawada">Vijayawada</option>
+              <option value="Guntur">Guntur</option>
+              <option value="Mangalagiri">Mangalagiri</option>
+            </select>
+          </div>
+          <div>
+            <label>Hours Remaining</label>
+            <select id="fHours" class="input-ctrl">
+              <option value="1.5">1.5 Hours (🚨 Critical)</option>
+              <option value="3">3 Hours</option>
+              <option value="6" selected>6 Hours</option>
+              <option value="12">12 Hours</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Publish Donation Listing</button>
+      </form>
+    </aside>
+
+    <!-- Available Donations Feed -->
+    <section class="card-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:10px;">
+        <div>
+          <h3 class="card-title">Live Surplus Stream</h3>
+          <p class="card-subtitle" style="margin-bottom:0;">Location-based distribution matcher</p>
+        </div>
+      </div>
+
+      <!-- Location-Based Matching Filter Bar -->
+      <div class="feed-filter" style="display:flex; gap:10px; align-items:center;">
+        <input type="text" id="searchBox" class="input-ctrl" style="flex:2;" placeholder="Search food items..." onkeyup="applyFilter()">
+        
+        <select id="filterLocation" class="input-ctrl" style="flex:1;" onchange="applyFilter()">
+          <option value="all">📍 All Locations</option>
+          <option value="Kolanukonda">Kolanukonda</option>
+          <option value="Vijayawada">Vijayawada</option>
+          <option value="Guntur">Guntur</option>
+          <option value="Mangalagiri">Mangalagiri</option>
+        </select>
+
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; white-space:nowrap; cursor:pointer;">
+          <input type="checkbox" id="filterUrgentOnly" onchange="applyFilter()"> 🚨 Critical
+        </label>
+      </div>
+
+      <div id="listingsContainer" class="listings-container"></div>
+    </section>
+
+  </main>
+
+  <!-- Pickup PIN Modal -->
+  <div id="pinModal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="font-size: 42px; margin-bottom: 8px;">🎉</div>
+      <h3 style="font-size: 20px; font-weight: 800; color: var(--dark);">Surplus Food Claimed!</h3>
+      <p style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">
+        Show this 4-digit verification PIN to the donor at pickup:
+      </p>
+
+      <div class="pin-display" id="modalPinText">0000</div>
+      <button onclick="closePinModal()" class="btn btn-primary btn-full">Close & View in Workspace</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

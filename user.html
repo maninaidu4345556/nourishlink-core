@@ -1,0 +1,143 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Workspace | NourishLink</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="navbar-wrapper">
+    <nav class="navbar">
+      <a href="index.html" class="brand">
+        <div class="brand-icon">🌱</div>
+        <div>
+          <span class="brand-name">NourishLink</span>
+          <span class="brand-tag">User Workspace</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link">Live Feed</a>
+        <a href="user.html" class="nav-link active">My Activity</a>
+        <button onclick="logout()" class="btn btn-outline btn-sm">Sign Out</button>
+      </div>
+    </nav>
+  </header>
+
+  <div class="portal-container">
+    
+    <!-- User Header Card -->
+    <div class="user-banner">
+      <div class="user-profile-header">
+        <div class="avatar-large" id="avatarInitial">U</div>
+        <div>
+          <h2 id="userNameDisplay" style="font-size:24px; font-weight:800; margin-bottom:4px;">User Profile</h2>
+          <span id="userRoleBadge" style="background:rgba(255,255,255,0.2); padding:4px 12px; border-radius:99px; font-size:12px; font-weight:700; text-transform:uppercase;">Member</span>
+          <span id="userEmailDisplay" style="margin-left:10px; font-size:13px; opacity:0.9;">user@mail.com</span>
+        </div>
+      </div>
+      <div>
+        <a href="index.html" class="btn btn-primary" style="background:#ffffff; color:var(--primary);">+ List More Food</a>
+      </div>
+    </div>
+
+    <!-- Activity Tabs -->
+    <div class="portal-tabs">
+      <button class="portal-tab-btn active" onclick="switchTab('claims', this)">My Claimed Food (with PINs)</button>
+      <button class="portal-tab-btn" onclick="switchTab('donations', this)">My Donated Listings</button>
+    </div>
+
+    <!-- Tab 1: Claims & PINs -->
+    <div id="tab-claims" class="tab-pane active">
+      <div class="card-box">
+        <h4 style="font-size:17px; margin-bottom:12px;">Active Pickups & Distributions</h4>
+        <div id="userClaimsList" style="display:flex; flex-direction:column; gap:12px;">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Tab 2: My Donations -->
+    <div id="tab-donations" class="tab-pane">
+      <div class="card-box">
+        <h4 style="font-size:17px; margin-bottom:12px;">Food Items You Have Listed</h4>
+        <div id="userDonationsList" style="display:flex; flex-direction:column; gap:12px;">Loading...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user) window.location.href = 'login.html';
+
+    document.getElementById('userNameDisplay').innerText = user.name;
+    document.getElementById('userEmailDisplay').innerText = user.email;
+    document.getElementById('userRoleBadge').innerText = user.role;
+    document.getElementById('avatarInitial').innerText = user.name.charAt(0).toUpperCase();
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.portal-tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tab).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    async function loadUserHistory() {
+      try {
+        const res = await fetch(`/api/user/activity?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json();
+
+        // Render Claims with Pickup PINs
+        const claimsList = document.getElementById('userClaimsList');
+        if (data.myClaims.length === 0) {
+          claimsList.innerHTML = `<p style="color:var(--text-muted); font-size:14px;">You haven't claimed any surplus food items yet.</p>`;
+        } else {
+          claimsList.innerHTML = data.myClaims.map(c => `
+            <div style="border: 1px solid var(--gray-border); border-radius: 10px; padding: 14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>${c.item}</strong> (~${c.quantityKg || 10} kg)
+                <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">📍 Pickup: ${c.location} | 🏢 Donor: ${c.donor}</div>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:11px; color:#15803d; font-weight:700; display:block;">Pickup PIN:</span>
+                <span style="font-size:18px; font-weight:800; font-family:monospace; background:#dcfce7; color:#15803d; padding:2px 8px; border-radius:6px;">${c.pickupPin || 'VERIFIED'}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // Render My Posted Donations
+        const donationsList = document.getElementById('userDonationsList');
+        if (data.myDonations.length === 0) {
+          donationsList.innerHTML = `<p style="color:var(--text-muted); font-size:14px;">No listings posted under this account.</p>`;
+        } else {
+          donationsList.innerHTML = data.myDonations.map(d => `
+            <div style="border: 1px solid var(--gray-border); border-radius: 10px; padding: 14px; display:flex; justify-content:space-between; align-items:center;">
+              <div>
+                <strong>${d.item}</strong> (~${d.quantityKg || 10} kg)
+                <div style="font-size:13px; color:var(--text-muted); margin-top:4px;">📍 ${d.location} | Status: <strong style="color:${d.claimed ? '#b91c1c' : '#15803d'}">${d.claimed ? 'Claimed by ' + d.claimedBy : 'Available'}</strong></div>
+              </div>
+              <div>
+                <span class="tag-badge ${d.claimed ? 'tag-claimed' : 'tag-available'}">${d.claimed ? 'Claimed' : 'Active'}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'login.html';
+    }
+
+    loadUserHistory();
+  </script>
+</body>
+</html>

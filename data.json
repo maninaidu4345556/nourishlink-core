@@ -1,0 +1,79 @@
+{
+  "users": [
+    {
+      "id": 1000,
+      "name": "Super Admin (Manikanta)",
+      "email": "gurrammanikantanaidu@gmail.com",
+      "password": "141610",
+      "role": "superadmin"
+    },
+    {
+      "id": 1001,
+      "name": "Green Leaf Bakery",
+      "email": "donor@bakery.com",
+      "password": "123",
+      "role": "donor"
+    },
+    {
+      "id": 1002,
+      "name": "Hope Food Bank",
+      "email": "charity@hope.org",
+      "password": "123",
+      "role": "recipient"
+    },
+    {
+      "id": 1790350279608,
+      "name": "personal",
+      "email": "yogeshkatari56@gmail.com",
+      "password": "123456",
+      "role": "donor"
+    }
+  ],
+  "donations": [
+    {
+      "id": 1,
+      "donorEmail": "donor@bakery.com",
+      "donor": "Green Leaf Bakery",
+      "item": "30 Loaves of Fresh Artisan Bread",
+      "category": "Bakery",
+      "dietType": "Veg",
+      "quantityKg": 15,
+      "location": "Vijayawada",
+      "expiryTimestamp": 1790355531995,
+      "claimed": false,
+      "claimedBy": null,
+      "claimedByEmail": null,
+      "pickupPin": null
+    },
+    {
+      "id": 2,
+      "donorEmail": "donor@bakery.com",
+      "donor": "City Supermarket",
+      "item": "50 kg Fresh Apples & Citrus",
+      "category": "Produce",
+      "dietType": "Vegan",
+      "quantityKg": 50,
+      "location": "Guntur",
+      "expiryTimestamp": 1790393331995,
+      "claimed": false,
+      "claimedBy": null,
+      "claimedByEmail": null,
+      "pickupPin": null
+    },
+    {
+      "id": 3,
+      "donorEmail": "donor@bakery.com",
+      "donor": "Grand Feast Caterers",
+      "item": "60 Prepared Rice & Vegetable Boxes",
+      "category": "Prepared Meals",
+      "dietType": "Veg",
+      "quantityKg": 30,
+      "location": "Kolanukonda",
+      "expiryTimestamp": 1790364531995,
+      "claimed": true,
+      "claimedBy": "Hope Food Bank",
+      "claimedByEmail": "charity@hope.org",
+      "pickupPin": "4821"
+    }
+  ]
+}
